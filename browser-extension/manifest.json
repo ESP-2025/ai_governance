@@ -12,7 +12,8 @@
     "https://claude.ai/*",
     "https://gemini.google.com/*",
     "https://copilot.microsoft.com/*",
-    "http://localhost:8000/*"
+    "http://localhost:8000/*",
+    "https://sunshineless-beckett-axial.ngrok-free.dev/*"
   ],
   "background": {
     "service_worker": "src/background/service-worker.js"

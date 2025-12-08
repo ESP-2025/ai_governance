@@ -69,8 +69,8 @@ function Policies() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: '700' }}>Policies</h1>
-        
-        <button 
+
+        <button
           className="btn btn-primary"
           onClick={() => setShowCreateForm(!showCreateForm)}
         >
@@ -83,7 +83,7 @@ function Policies() {
       {showCreateForm && (
         <div className="card" style={{ marginBottom: '24px' }}>
           <h2 className="card-title" style={{ marginBottom: '20px' }}>Create New Policy</h2>
-          
+
           <form onSubmit={handleCreatePolicy}>
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
@@ -92,7 +92,7 @@ function Policies() {
               <input
                 type="text"
                 value={newPolicy.name}
-                onChange={(e) => setNewPolicy({...newPolicy, name: e.target.value})}
+                onChange={(e) => setNewPolicy({ ...newPolicy, name: e.target.value })}
                 placeholder="e.g., Engineering Team Policy"
                 required
                 style={{
@@ -110,7 +110,7 @@ function Policies() {
                 <input
                   type="checkbox"
                   checked={newPolicy.block_pii}
-                  onChange={(e) => setNewPolicy({...newPolicy, block_pii: e.target.checked})}
+                  onChange={(e) => setNewPolicy({ ...newPolicy, block_pii: e.target.checked })}
                   style={{ marginRight: '8px' }}
                 />
                 <span style={{ fontSize: '14px' }}>Block PII (Personally Identifiable Information)</span>
@@ -130,7 +130,7 @@ function Policies() {
                       onChange={(e) => {
                         if (e.target.checked) {
                           setNewPolicy({
-                            ...newPolicy, 
+                            ...newPolicy,
                             allowed_tools: [...newPolicy.allowed_tools, tool]
                           })
                         } else {
@@ -152,8 +152,8 @@ function Policies() {
               <button type="submit" className="btn btn-primary">
                 Create Policy
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-secondary"
                 onClick={() => setShowCreateForm(false)}
               >
@@ -171,10 +171,10 @@ function Policies() {
           Active Policies
         </h2>
 
-        {policies.length > 0 ? (
+        {Array.isArray(policies) && policies.length > 0 ? (
           <div style={{ display: 'grid', gap: '16px' }}>
             {policies.map((policy) => (
-              <div 
+              <div
                 key={policy.id}
                 style={{
                   padding: '20px',
@@ -211,7 +211,7 @@ function Policies() {
                     </p>
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       {policy.rules_json.allowed_tools?.map(tool => (
-                        <span 
+                        <span
                           key={tool}
                           style={{
                             padding: '4px 10px',
@@ -232,8 +232,8 @@ function Policies() {
             ))}
           </div>
         ) : (
-          <div style={{ 
-            textAlign: 'center', 
+          <div style={{
+            textAlign: 'center',
             padding: '60px 20px',
             color: '#666'
           }}>
@@ -245,15 +245,15 @@ function Policies() {
       </div>
 
       {/* Default Policy Info */}
-      <div style={{ 
-        padding: '16px', 
-        background: '#eff6ff', 
+      <div style={{
+        padding: '16px',
+        background: '#eff6ff',
         border: '1px solid #bfdbfe',
         borderRadius: '8px',
         marginTop: '20px'
       }}>
         <p style={{ margin: 0, fontSize: '14px', color: '#1e40af' }}>
-          <strong>💡 Tip:</strong> Policies are automatically applied to all users in your organization. 
+          <strong>💡 Tip:</strong> Policies are automatically applied to all users in your organization.
           The browser extension will enforce these rules in real-time.
         </p>
       </div>

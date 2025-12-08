@@ -14,7 +14,7 @@ function PromptHistory() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
-  
+
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [toolFilter, setToolFilter] = useState('');
@@ -36,10 +36,10 @@ function PromptHistory() {
         page: page,
         page_size: 20
       });
-      
+
       if (toolFilter) params.append('tool', toolFilter);
       if (piiFilter) params.append('had_pii', piiFilter);
-      
+
       const response = await api.get(`/prompt-history/?${params}`);
       setHistory(response.data.items);
       setTotalPages(Math.ceil(response.data.total / 20));
@@ -59,11 +59,11 @@ function PromptHistory() {
     }
   };
 
-  const filteredHistory = history.filter(item => {
+  const filteredHistory = Array.isArray(history) ? history.filter(item => {
     if (!searchTerm) return true;
     return item.original_prompt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           item.final_prompt.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+      item.final_prompt.toLowerCase().includes(searchTerm.toLowerCase());
+  }) : [];
 
   const getImprovementColor = (delta) => {
     if (delta > 20) return '#10b981'; // green
@@ -85,8 +85,8 @@ function PromptHistory() {
 
       {/* Stats Cards */}
       {stats && (
-        <div style={{ 
-          display: 'grid', 
+        <div style={{
+          display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
           gap: '16px',
           marginBottom: '24px'
@@ -98,7 +98,7 @@ function PromptHistory() {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}>
             <div style={{ fontSize: '32px', fontWeight: '700', color: '#2563eb', marginBottom: '4px' }}>
-              {stats.total_prompts.toLocaleString()}
+              {stats?.total_prompts?.toLocaleString() || 0}
             </div>
             <div style={{ fontSize: '14px', color: '#666' }}>Total Prompts</div>
           </div>
@@ -110,7 +110,7 @@ function PromptHistory() {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}>
             <div style={{ fontSize: '32px', fontWeight: '700', color: '#10b981', marginBottom: '4px' }}>
-              +{stats.avg_improvement.toFixed(1)}
+              +{stats?.avg_improvement?.toFixed(1) || '0.0'}
             </div>
             <div style={{ fontSize: '14px', color: '#666' }}>Avg Quality Improvement</div>
           </div>
@@ -122,7 +122,7 @@ function PromptHistory() {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}>
             <div style={{ fontSize: '32px', fontWeight: '700', color: '#f59e0b', marginBottom: '4px' }}>
-              {stats.pii_incidents}
+              {stats?.pii_incidents || 0}
             </div>
             <div style={{ fontSize: '14px', color: '#666' }}>PII Incidents</div>
           </div>
@@ -134,7 +134,7 @@ function PromptHistory() {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}>
             <div style={{ fontSize: '32px', fontWeight: '700', color: '#8b5cf6', marginBottom: '4px' }}>
-              {(stats.variant_adoption_rate * 100).toFixed(0)}%
+              {((stats?.variant_adoption_rate || 0) * 100).toFixed(0)}%
             </div>
             <div style={{ fontSize: '14px', color: '#666' }}>Adoption Rate</div>
           </div>
@@ -274,10 +274,10 @@ function PromptHistory() {
                       {new Date(item.timestamp).toLocaleString()}
                     </td>
                     <td style={{ padding: '12px 16px', fontSize: '13px', color: '#1f2937', maxWidth: '300px' }}>
-                      <div style={{ 
-                        overflow: 'hidden', 
-                        textOverflow: 'ellipsis', 
-                        whiteSpace: 'nowrap' 
+                      <div style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
                       }}>
                         {item.original_prompt}
                       </div>
@@ -298,8 +298,8 @@ function PromptHistory() {
                       {item.improvement_delta !== null && (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                           <TrendingUp size={16} style={{ color: getImprovementColor(item.improvement_delta) }} />
-                          <span style={{ 
-                            fontWeight: '600', 
+                          <span style={{
+                            fontWeight: '600',
                             color: getImprovementColor(item.improvement_delta),
                             fontSize: '13px'
                           }}>
@@ -489,8 +489,8 @@ function PromptHistory() {
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Improvement</div>
-                <div style={{ 
-                  fontSize: '16px', 
+                <div style={{
+                  fontSize: '16px',
                   fontWeight: '600',
                   color: getImprovementColor(selectedPrompt.improvement_delta || 0)
                 }}>

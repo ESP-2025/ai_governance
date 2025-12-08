@@ -73,9 +73,9 @@ class APIClient {
       original_prompt: originalPrompt,
       context: context || 'general'
     });
-    
+
     if (this.userEmail) {
-        params.append('user_email', this.userEmail);
+      params.append('user_email', this.userEmail);
     }
 
     return this._request(`/prompt-variants/?${params}`, {
@@ -106,7 +106,7 @@ class APIClient {
    * @param {Object} data - Alert data
    */
   async createAlert(data) {
-    return this._request('/alerts', {
+    return this._request('/alerts/', {
       method: 'POST',
       body: JSON.stringify({
         user_email: this.userEmail,

@@ -168,7 +168,7 @@ function Dashboard() {
       </div>
 
       {/* Recent Alerts */}
-      {alerts.length > 0 && (
+      {Array.isArray(alerts) && alerts.length > 0 && (
         <div className="card">
           <div className="card-header">
             <h2 className="card-title">Recent Alerts</h2>

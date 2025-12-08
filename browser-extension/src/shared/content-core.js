@@ -11,25 +11,25 @@ class ContentCore {
     this.piiDetector = new PIIDetector();
     this.apiClient = new APIClient(this.config);
     this.variantModal = new VariantModal();
-    
+
     // State
     this.isIntercepting = false;
     this.isProgrammaticTrigger = false;
     this.lastProcessedPrompt = null;
     this.lastProcessedTime = 0;
-    
+
     this.initialize();
   }
 
   initialize() {
     console.log(`[AI Governance] Initializing for ${this.platform.name}...`);
-    
+
     // Load user email from settings
     this._loadUserEmail();
 
     // Attach event listeners
     this._attachListeners();
-    
+
     console.log(`[AI Governance] ${this.platform.name} monitor active`);
   }
 
@@ -80,7 +80,7 @@ class ContentCore {
   _getInput() {
     // Try each platform-specific selector (may be comma-separated list)
     const selectors = this.platform.selectors.input.split(',').map(s => s.trim());
-    
+
     for (const selector of selectors) {
       try {
         const input = document.querySelector(selector);
@@ -92,10 +92,10 @@ class ContentCore {
         console.debug(`[AI Governance] Invalid selector: ${selector}`);
       }
     }
-    
+
     // Fallback to common selectors if not found
-    return document.querySelector('div[contenteditable="true"]') || 
-           document.querySelector('textarea');
+    return document.querySelector('div[contenteditable="true"]') ||
+      document.querySelector('textarea');
   }
 
   _getInputText(element) {
@@ -109,13 +109,13 @@ class ContentCore {
 
   _setInputText(element, text) {
     if (!element) return;
-    
+
     if (element.tagName === 'TEXTAREA') {
       element.value = text;
     } else {
       element.innerText = text;
     }
-    
+
     // Trigger input events to notify frameworks (React, etc)
     element.dispatchEvent(new Event('input', { bubbles: true }));
     element.dispatchEvent(new Event('change', { bubbles: true }));
@@ -134,8 +134,8 @@ class ContentCore {
     const now = Date.now();
     // If we are programmatically triggering, skip interception
     if (this.isProgrammaticTrigger) {
-        this.isProgrammaticTrigger = false;
-        return;
+      this.isProgrammaticTrigger = false;
+      return;
     }
 
     if (originalPrompt === this.lastProcessedPrompt && (now - this.lastProcessedTime) < 2000) {
@@ -181,28 +181,33 @@ class ContentCore {
       try {
         // Show loading modal immediately
         this.variantModal.showLoading();
-        
+
         const variantData = await this.apiClient.getPromptVariants(originalPrompt, this.platform.name);
-        
+
         if (variantData && variantData.variants && variantData.variants.length > 0) {
           // Update modal with variants
           const selection = await this.variantModal.show({
             originalPrompt: originalPrompt,
             variants: variantData.variants
           });
-          
+
           // If user chose a variant (selection is the text string)
           if (selection && selection !== originalPrompt) {
             finalPrompt = selection;
             this._setInputText(input, finalPrompt);
-            
+
             // Find index
             variantSelected = variantData.variants.findIndex(v => v.text === selection);
+
+            // Notify service worker that a variant was used
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+              chrome.runtime.sendMessage({ type: 'VARIANT_USED' }).catch(() => { });
+            }
           }
           variantsOffered = variantData.variants;
         } else {
-            // If no variants, close loading
-            this.variantModal.close();
+          // If no variants, close loading
+          this.variantModal.close();
         }
       } catch (error) {
         console.warn('[AI Governance] Failed to get variants:', error);
@@ -213,10 +218,15 @@ class ContentCore {
     // 3. Log Usage & History
     this._logInteraction(originalPrompt, finalPrompt, piiResult, variantsOffered, variantSelected);
 
+    // Notify service worker that a prompt was monitored
+    if (typeof chrome !== 'undefined' && chrome.runtime) {
+      chrome.runtime.sendMessage({ type: 'PROMPT_MONITORED' }).catch(() => { });
+    }
+
     // 4. Submit
     this.lastProcessedPrompt = finalPrompt;
     this.lastProcessedTime = Date.now();
-    
+
     // Small delay to ensure UI updates
     setTimeout(() => {
       this._triggerSend();
@@ -226,7 +236,12 @@ class ContentCore {
   async _handlePII(piiResult) {
     // Show Alert
     await this._showPIIAlert(piiResult);
-    
+
+    // Notify service worker that PII was blocked
+    if (typeof chrome !== 'undefined' && chrome.runtime) {
+      chrome.runtime.sendMessage({ type: 'PII_BLOCKED' }).catch(() => { });
+    }
+
     // Log Alert
     try {
       await this.apiClient.createAlert({
@@ -246,7 +261,7 @@ class ContentCore {
     return new Promise((resolve) => {
       const modal = document.createElement('div');
       modal.id = 'ai-gov-pii-alert';
-      
+
       // Reusing styles from previous implementation, but ensuring visibility
       const style = document.createElement('style');
       style.textContent = `
@@ -275,7 +290,7 @@ class ContentCore {
         #ai-gov-pii-alert button:hover { background: #b91c1c; }
       `;
       modal.appendChild(style);
-      
+
       const alertBox = document.createElement('div');
       alertBox.className = 'alert-box';
       alertBox.innerHTML = `
@@ -286,14 +301,14 @@ class ContentCore {
         </div>
         <p>Please remove this sensitive information before submitting.</p>
       `;
-      
+
       const okBtn = document.createElement('button');
       okBtn.textContent = 'OK, I understand';
       okBtn.addEventListener('click', () => {
         document.body.removeChild(modal);
         resolve();
       });
-      
+
       alertBox.appendChild(okBtn);
       modal.appendChild(alertBox);
       document.body.appendChild(modal);
@@ -301,17 +316,17 @@ class ContentCore {
   }
 
   async _logInteraction(original, final, piiResult, variants, selectedIndex) {
-    console.error('='*80);
+    console.error('='.repeat(80));
     console.error('[AI Governance] ===== _logInteraction CALLED =====');
     console.error('[AI Governance] Original:', original.substring(0, 50));
     console.error('[AI Governance] Final:', final.substring(0, 50));
     console.error('[AI Governance] Variants:', variants);
     console.error('[AI Governance] Selected Index:', selectedIndex);
     console.error('[AI Governance] Config:', {
-        USAGE_LOGGING: this.config.FEATURES.USAGE_LOGGING, 
-        PROMPT_HISTORY: this.config.FEATURES.PROMPT_HISTORY 
+      USAGE_LOGGING: this.config.FEATURES.USAGE_LOGGING,
+      PROMPT_HISTORY: this.config.FEATURES.PROMPT_HISTORY
     });
-    console.error('='*80);
+    console.error('='.repeat(80));
 
     if (!this.config.FEATURES.USAGE_LOGGING) {
       console.error('[AI Governance] USAGE_LOGGING is false, returning early');

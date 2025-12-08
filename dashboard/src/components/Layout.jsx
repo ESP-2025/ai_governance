@@ -3,7 +3,11 @@ import { LayoutDashboard, BarChart3, AlertTriangle, Lightbulb, Shield, LogOut } 
 import { useAuth } from '../contexts/AuthContext'
 
 function Layout() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -27,8 +31,8 @@ function Layout() {
           marginBottom: '24px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img 
-              src={user.picture} 
+            <img
+              src={user.picture}
               alt={user.name}
               style={{
                 width: '40px',
@@ -46,28 +50,28 @@ function Layout() {
             </div>
           </div>
         </div>
-        
+
         <div>
           <NavLink to="/dashboard" className="nav-link">
             <LayoutDashboard size={20} />
             Dashboard
           </NavLink>
-          
+
           <NavLink to="/usage" className="nav-link">
             <BarChart3 size={20} />
             Usage Analytics
           </NavLink>
-          
+
           <NavLink to="/alerts" className="nav-link">
             <AlertTriangle size={20} />
             Compliance Alerts
           </NavLink>
-          
+
           <NavLink to="/prompts" className="nav-link">
             <Lightbulb size={20} />
             Prompt Improvements
           </NavLink>
-          
+
           <NavLink to="/policies" className="nav-link">
             <Shield size={20} />
             Policies
@@ -92,7 +96,7 @@ function Layout() {
           </button>
         </div>
       </nav>
-      
+
       <main className="main-content">
         <Outlet />
       </main>

@@ -5,17 +5,17 @@
 
 const CONFIG = {
   // Backend API URL
-  API_URL: 'http://localhost:8000',
-  
+  API_URL: 'https://sunshineless-beckett-axial.ngrok-free.dev',
+
   // API Key for authentication
   API_KEY: 'dev-secret-key-change-in-production',
-  
+
   // User email (loaded from storage)
-  USER_EMAIL: null,
-  
+  USER_EMAIL: 'joshini.mn@gmail.com',
+
   // Organization ID
   ORG_ID: 1,
-  
+
   // Feature flags
   FEATURES: {
     PII_DETECTION: true,
@@ -23,7 +23,7 @@ const CONFIG = {
     USAGE_LOGGING: true,
     PROMPT_HISTORY: true
   },
-  
+
   // Supported AI tools
   AI_TOOLS: {
     'chat.openai.com': 'chatgpt',

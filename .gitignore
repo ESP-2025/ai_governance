@@ -400,7 +400,7 @@ temp/
 # User configuration
 backend/.env
 backend/.env.local
-dashboard/.env
+
 dashboard/.env.local
 browser-extension/config.local.js
 
@@ -480,3 +480,7 @@ public/uploads/
 # NewRelic
 newrelic.ini
 newrelic_agent.log
+
+!dashboard/.env
+
+!backend/.env

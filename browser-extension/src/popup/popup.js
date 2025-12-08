@@ -7,7 +7,7 @@
 async function loadStats() {
   try {
     const stats = await chrome.runtime.sendMessage({ type: 'GET_STATS' });
-    
+
     document.getElementById('prompts-count').textContent = stats.promptsMonitored || 0;
     document.getElementById('pii-count').textContent = stats.piiBlocked || 0;
     document.getElementById('variants-count').textContent = stats.variantsUsed || 0;
@@ -19,7 +19,7 @@ async function loadStats() {
 // View dashboard button
 document.getElementById('view-dashboard').addEventListener('click', () => {
   chrome.tabs.create({
-    url: 'http://localhost:3000'
+    url: 'https://articulative-protozoonal-emersyn.ngrok-free.dev'
   });
 });
 
@@ -30,7 +30,7 @@ document.getElementById('test-connection').addEventListener('click', async () =>
   button.disabled = true;
 
   try {
-    const response = await fetch('http://localhost:8000/health', {
+    const response = await fetch('https://sunshineless-beckett-axial.ngrok-free.dev/health', {
       headers: {
         'X-API-Key': 'dev-secret-key-change-in-production'
       }
@@ -60,8 +60,12 @@ document.getElementById('settings-link').addEventListener('click', (e) => {
 // Load user email
 async function loadEmail() {
   chrome.storage.local.get(['userEmail'], (result) => {
-    if (result.userEmail) {
-      document.getElementById('user-email').value = result.userEmail;
+    const email = result.userEmail || 'joshini.mn@gmail.com';
+    document.getElementById('user-email').value = email;
+
+    // If no email was stored, save the default
+    if (!result.userEmail) {
+      chrome.storage.local.set({ userEmail: 'joshini.mn@gmail.com' });
     }
   });
 }
@@ -70,17 +74,17 @@ async function loadEmail() {
 document.getElementById('save-email').addEventListener('click', () => {
   const email = document.getElementById('user-email').value.trim();
   const status = document.getElementById('save-status');
-  
+
   if (!email) {
     status.textContent = 'Please enter a valid email';
     status.style.color = '#dc2626';
     return;
   }
-  
+
   chrome.storage.local.set({ userEmail: email }, () => {
     status.textContent = 'Email saved successfully!';
     status.style.color = '#10b981';
-    
+
     // Clear status after 2 seconds
     setTimeout(() => {
       status.textContent = '';

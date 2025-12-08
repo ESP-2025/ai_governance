@@ -22,7 +22,7 @@ function ComplianceAlerts() {
       const filters = { days: 30 }
       if (filter === 'resolved') filters.resolved = true
       if (filter === 'unresolved') filters.resolved = false
-      
+
       const data = await alertsApi.getAlerts(filters)
       setAlerts(data)
       setError(null)
@@ -55,8 +55,8 @@ function ComplianceAlerts() {
     return <div className="error">{error}</div>
   }
 
-  const unresolvedCount = alerts.filter(a => !a.resolved).length
-  const resolvedCount = alerts.filter(a => a.resolved).length
+  const unresolvedCount = Array.isArray(alerts) ? alerts.filter(a => !a.resolved).length : 0
+  const resolvedCount = Array.isArray(alerts) ? alerts.filter(a => a.resolved).length : 0
 
   return (
     <div>
@@ -130,7 +130,7 @@ function ComplianceAlerts() {
               </tr>
             </thead>
             <tbody>
-              {alerts.map((alert) => (
+              {Array.isArray(alerts) && alerts.map((alert) => (
                 <tr key={alert.id}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
