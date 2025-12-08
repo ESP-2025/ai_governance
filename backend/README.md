@@ -228,59 +228,6 @@ docker exec -i aigovernance_db psql -U aigovernance aigovernance_db < backup.sql
 docker-compose logs -f backend
 ```
 
-## Troubleshooting
-
-**Database connection error:**
-- Ensure PostgreSQL is running
-- Check DATABASE_URL in .env
-
-**API key invalid:**
-- Verify X-API-Key header matches API_KEY_SECRET in .env
-
-**CORS error from dashboard:**
-- Add dashboard URL to ALLOWED_ORIGINS in .env
-
-## Cost Considerations (POC)
-
-✅ **FREE Components:**
-- PostgreSQL (self-hosted)
-- FastAPI (Python framework)
-- All backend code
-
-💰 **NOT Needed for POC:**
-- Claude API (Person 3 handles this)
-- Cloud hosting (run locally)
-- Monitoring tools
-
-
-## Project Structure
-
-```
-backend/
-├── app/
-│   ├── api/
-│   │   └── routes/
-│   │       ├── __init__.py
-│   │       ├── usage.py
-│   │       ├── policies.py
-│   │       └── analytics.py
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── config.py
-│   │   └── security.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── database.py
-│   │   └── schemas.py
-│   └── main.py
-├── .env.example
-├── .gitignore
-├── docker-compose.yml
-├── Dockerfile
-├── README.md
-└── requirements.txt
-```
-
 ## Prompt Generation Feature
 
 The backend now includes integrated prompt generation - no separate service needed!

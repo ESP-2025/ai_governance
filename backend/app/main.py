@@ -40,7 +40,8 @@ curl -H "X-API-Key: your-api-key-here" http://localhost:8000/health
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.get_allowed_origins(),
+    allow_origin_regex=r"https?://.*\.ngrok-free\.dev",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

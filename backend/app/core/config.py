@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     API_KEY_SECRET: str
     
     # CORS allowed origins (comma-separated list)
-    ALLOWED_ORIGINS: str = "http://localhost:3000"
+    CORS_ORIGINS: str = "https://articulative-protozoonal-emersyn.ngrok-free.dev,http://localhost:8000"
     
     # Server configuration
     HOST: str = "0.0.0.0"
@@ -32,13 +32,19 @@ class Settings(BaseSettings):
     # Gemini API Configuration
     GEMINI_API_KEY: str  # No default - MUST be set in .env
     GEMINI_MODEL: str = "gemini-2.0-flash-lite"
+
+    # Auth0 Configuration
+    AUTH0_DOMAIN: str
+    AUTH0_AUDIENCE: str
+    AUTH0_ALGORITHMS: List[str] = ["RS256"]
     
     class Config:
         env_file = ".env"
+        extra = "ignore"
     
     def get_allowed_origins(self) -> List[str]:
         """Convert comma-separated origins string to list"""
-        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
 
 
 # Global settings instance

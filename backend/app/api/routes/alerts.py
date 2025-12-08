@@ -1,14 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from typing import List, Optional, Dict
 from ...core.security import verify_api_key
+from ...models.schemas import AlertCreate
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
-
-class AlertCreate(BaseModel):
-    user_email: Optional[str] = None
-    violation_type: str
-    details: Dict
 
 @router.post("/")
 async def create_alert(
@@ -20,6 +15,10 @@ async def create_alert(
     """
     # In a real system, this would save to the database.
     # For now, we'll just log it to the console/stdout so it's visible.
+    # Enforce default email if not provided
+    if not alert.user_email:
+        alert.user_email = "joshini.mn@gmail.com"
+
     print(f"ALERTS: Received alert from {alert.user_email}: {alert.violation_type}")
     print(f"DETAILS: {alert.details}")
     

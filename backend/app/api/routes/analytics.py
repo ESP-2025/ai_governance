@@ -4,7 +4,8 @@ Provides aggregated statistics for dashboard.
 """
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, cast, String
+
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -49,16 +50,16 @@ async def get_usage_analytics(
     ).group_by(UsageLog.tool).all()
     
     prompts_by_tool = {tool: count for tool, count in prompts_by_tool_data}
-    
+
     # Prompts by risk level
     prompts_by_risk_data = db.query(
-        UsageLog.risk_level,
+        cast(UsageLog.risk_level, String).label('risk_level'),
         func.count(UsageLog.id).label('count')
     ).filter(
         UsageLog.timestamp >= cutoff_date
-    ).group_by(UsageLog.risk_level).all()
+    ).group_by(cast(UsageLog.risk_level, String)).all()
     
-    prompts_by_risk = {risk.value: count for risk, count in prompts_by_risk_data}
+    prompts_by_risk = {risk: count for risk, count in prompts_by_risk_data}
     
     # Top users
     top_users_data = db.query(

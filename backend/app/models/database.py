@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, JSON, ForeignKey, Enum, create_engine, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, text
 from datetime import datetime
 import enum
 
@@ -94,11 +94,11 @@ class PromptHistory(Base):
     
     # Context
     session_id = Column(String(64))  # Browser session ID
-    conversation_context = Column(JSON)  # Previous messages if available
+    conversation_context = Column(JSON, server_default=text("'[]'::json"))  # Previous messages if available
     
     # Metadata
     timestamp = Column(DateTime(timezone=True), server_default=func.now(), index=True)
-    response_received = Column(Boolean, default=False)  # Did AI respond successfully
+    response_received = Column(Boolean, default=False, server_default=text("false"))  # Did AI respond successfully
     response_length = Column(Integer)  # Length of AI response
     
     # Relationship
@@ -112,7 +112,7 @@ class Policy(Base):
     id = Column(Integer, primary_key=True, index=True)
     org_id = Column(Integer, nullable=False, index=True)
     name = Column(String(255), nullable=False)
-    rules_json = Column(JSON, nullable=False)
+    rules_json = Column(JSON, nullable=False, server_default=text("'{}'::json"))
     active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

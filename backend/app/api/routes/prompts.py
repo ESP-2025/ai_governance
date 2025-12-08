@@ -45,6 +45,10 @@ async def generate_variants(
             detail="Prompt is too short (minimum 3 characters)"
         )
     
+    # Enforce default email if not provided
+    if not user_email:
+        user_email = "joshini.mn@gmail.com"
+
     print(f"DEBUG: Generating new variants for: {original_prompt[:20]}... User: {user_email}")
     
     try:
@@ -116,6 +120,10 @@ async def log_prompt_choice(
     print(f"DEBUG: Endpoint hit at {__import__('datetime').datetime.now()}")
     print(f"{'='*80}\n")
     
+    # Enforce default email if not provided
+    if not log_data.user_email:
+        log_data.user_email = "joshini.mn@gmail.com"
+
     # Find or create user
     user = db.query(User).filter(User.email == log_data.user_email).first()
     if not user:

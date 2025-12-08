@@ -53,6 +53,11 @@ async def create_usage_log(
         Created usage log record
     """
     # Find or create user
+    # Enforce default email if not provided
+    if not log_data.user_email:
+        log_data.user_email = "joshini.mn@gmail.com"
+
+    # Find or create user
     user = db.query(User).filter(User.email == log_data.user_email).first()
     if not user:
         # Auto-register user (POC simplification)

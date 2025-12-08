@@ -12,7 +12,7 @@ class RiskLevel(str, Enum):
 
 # Existing schemas...
 class UsageLogCreate(BaseModel):
-    user_email: EmailStr
+    user_email: Optional[str] = "joshini.mn@gmail.com"
     tool: str
     prompt_hash: str
     risk_level: RiskLevel = RiskLevel.LOW
@@ -40,7 +40,7 @@ class PromptVariant(BaseModel):
 
 class PromptLogCreate(BaseModel):
     """Create prompt log"""
-    user_email: EmailStr
+    user_email: Optional[str] = "joshini.mn@gmail.com"
     original_prompt: str
     chosen_variant: str
     variants: List[PromptVariant]
@@ -159,7 +159,7 @@ class PolicyResponse(BaseModel):
 
 # Alert schemas
 class AlertCreate(BaseModel):
-    user_email: EmailStr
+    user_email: Optional[str] = "joshini.mn@gmail.com"
     violation_type: str
     details: Optional[dict] = None
 
